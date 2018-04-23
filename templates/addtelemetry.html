@@ -1,0 +1,15 @@
+<a href="/">Main Site</a>
+<hr/>
+<form method="post" action="/compile/">
+    {% csrf_token %}
+    <h3>Grok Statements:</h1>
+    <textarea rows="10" cols="120" name="regular" placeholder="Enter You Grok"></textarea><br/>
+    <h3>Path of Your Logfile<h3>
+    <textarea rows="1" cols="120" name="logpath" placeholder="/path/your/logs/"></textarea><br/>
+    <h3>Topics Name</h3>
+    <textarea rows="1" cols="120" name="topics" placeholder="Topic Name"></textarea><br/>
+    <br/><br/> 
+    <button type="submit">Submit</button>
+</form>
+<hr/>
+<h2>Status of Compilation: </h2> {{ status }}
