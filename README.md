@@ -12,3 +12,6 @@ This repo should place in dir that using vagrant ssh to node of metron.
 ## Avialable Service
     - Login to manage page
     - Add topic and map log to kibana
+
+## For admin
+/admin url is enabled.
