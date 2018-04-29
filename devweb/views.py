@@ -31,36 +31,16 @@ def logout_view(request):
     logout(request);
     return redirect('/')
 
+
 @login_required(login_url='/login/')
 def index(request):
     return render(request, "home.html",{'user':request.user}) 
 
 
 @login_required(login_url='/login/')
-def elastic(request):
-    import subprocess
-    import sys
-    #with open('elastic.log','w') as f:
-    proc = subprocess.Popen(['curl','node1:9200'], stdout=subprocess.PIPE)
-    print("**************************\n")
-    print(str(proc))
-    '''
-    for c in iter(lambda: proc.stdout.read(1),''):
-        sys.stdout.write(c)
-        f.write(c)
-
-    #webdoc = subprocess.check_call(['curl','node1:9200'])
-    print("#######################################\n")
-    print(subprocess.check_output(['curl','node1:9200']))
-    print("#######################################\n")
-    #return HttpResponse("Elastic")
-    '''
-    return HttpResponse(subprocess.check_output(['curl','node1:8080']))
-
-
-@login_required(login_url='/login/')
 def ambari(request):
     return HttpResponse("Ambari")
+
 
 @login_required(login_url='/login')
 def compile(request):
@@ -75,7 +55,7 @@ def compile(request):
         print("Topic: {}".format(str(topic_name)))
     
         ### Start Compile New Topology to Metron
-        import pdb; 
+        #import pdb; 
         import subprocess  
         # -- initial process to vagrant ssh
         print("###### initial Procss\n\n\n")
@@ -172,19 +152,21 @@ def compile(request):
         proc.stdin.write(command.encode('utf-8'))
         #print(command)
         
-        # -- LAST: Last Step 
-        print("#\n\n\n -- Last STEP -- MAP LOG")
-        command = 'tail {} | /usr/hdp/current/kafka-broker/bin/kafka-console-producer.sh --broker-list node1:6667 --topic {}\n'.format(str(path_name),str(topic_name))
-        proc.stdin.write(command.encode('utf-8'))
-
         # Map whois 
+        print("\n\n\nenrichment")
         whois_str = '\n{\n     "zkQuorum" : "node1:2181"\n    ,"sensorToFieldList" : {\n          "%s" : {\n             "type" : "ENRICHMENT"\n            ,"fieldToEnrichmentTypes" : {\n                 "domain_without_subdomains" : [ "whois" ]\n              }\n          }\n    }\n}'%(str(topic_name))
         command = 'cat > /usr/whois/enrichment_config_whois_{}.json << EOF\n{}\nEOF\n'.format(str(topic_name),str(whois_str))
         proc.stdin.write(command.encode('utf-8'))
 
-        command = 'iconv -c -f utf-8 -t ascii /usr/whois/enrichment_config_whois_{}.json -o /usr/whois/enrichment_config_whois_{}.json'.format(str(topic_name),str(topic_name))
+        command = 'iconv -c -f utf-8 -t ascii /usr/whois/enrichment_config_whois_{}.json -o /usr/whois/enrichment_config_whois_{}.json\n'.format(str(topic_name),str(topic_name))
         proc.stdin.write(command.encode('utf-8'))
-        command = '/usr/metron/0.4.0/bin/flatfile_loader.sh -n /usr/whois/enrichment_config_whois_{}.json -i /usr/whois/whois_ref.csv -t enrichment -c t -e /usr/whois/extractor_config_whois.json'.format(str(topic_name))
+        command = '/usr/metron/0.4.0/bin/flatfile_loader.sh -n /usr/whois/enrichment_config_whois_{}.json -i /usr/whois/whois_ref.csv -t enrichment -c t -e /usr/whois/extractor_config_whois.json\n'.format(str(topic_name))
+        print(command)
+        proc.stdin.write(command.encode('utf-8'))
+
+        # -- LAST: Last Step 
+        print("#\n\n\n -- Last STEP -- MAP LOG")
+        command = 'tail {} | /usr/hdp/current/kafka-broker/bin/kafka-console-producer.sh --broker-list node1:6667 --topic {}\n'.format(str(path_name),str(topic_name))
         proc.stdin.write(command.encode('utf-8'))
 
         # Check output form the proc
