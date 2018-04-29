@@ -164,6 +164,17 @@ def compile(request):
         print(command)
         proc.stdin.write(command.encode('utf-8'))
 
+        # fixed time stamp
+        print("\n\n\nTime Stamp process")
+        command = 'curl -XPOST node1:9200/_template/%s_index -d \' { "template": "%s_index*", "mappings": { "%s_doc": { "_timestamp": { "enabled": true }, "properties": { "timestamp": { "type": "date", "format": "epoch_millis" }, "source:type": { "type": "string", "index": "not_analyzed" }, "action": { "type": "string", "index": "not_analyzed" }, "bytes": { "type": "integer" }, "code": { "type": "string", "index": "not_analyzed" }, "domain_without_subdomains": { "type": "string", "index": "not_analyzed" }, "full_hostname": { "type": "string", "index": "not_analyzed" }, "elapsed": { "type": "integer" }, "method": { "type": "string", "index": "not_analyzed" }, "ip_dst_addr": { "type": "string", "index": "not_analyzed" } } } } }\'\n'%(str(topic_name),str(topic_name),str(topic_name))
+        proc.stdin.write(command.encode('utf-8'))
+
+        command = 'curl -XDELETE node1:9200/%s*\n'%(str(topic_name))
+        proc.stdin.write(command.encode('utf-8'))
+        command = 'curl -XGET node1:9200/%s*\n'%(str(topic_name))
+        proc.stdin.write(command.encode('utf-8'))
+
+
         # -- LAST: Last Step 
         print("#\n\n\n -- Last STEP -- MAP LOG")
         command = 'tail {} | /usr/hdp/current/kafka-broker/bin/kafka-console-producer.sh --broker-list node1:6667 --topic {}\n'.format(str(path_name),str(topic_name))
