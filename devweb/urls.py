@@ -23,7 +23,8 @@ urlpatterns = [
     path('login/', views.login_view, name="Login"),
     path('logout/', views.logout_view, name="Logout"),
     path('compile/', views.compile, name="Add new source"),
-    path('elastic/', views.elastic, name="elastic search"),
-    path('ambari/', views.ambari, name="Main UI"),
     path('', views.index, name="main"),
 ]
+
+handler404 = views.error_404
+handler500 = views.error_404
