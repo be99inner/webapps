@@ -1,0 +1,12 @@
+
+{
+     "zkQuorum" : "node1:2181"
+    ,"sensorToFieldList" : {
+          "test" : {
+             "type" : "ENRICHMENT"
+            ,"fieldToEnrichmentTypes" : {
+                 "domain_without_subdomains" : [ "whois" ]
+              }
+          }
+    }
+}
