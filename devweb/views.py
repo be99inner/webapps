@@ -5,6 +5,10 @@ from django.contrib.auth import (authenticate, get_user_model, login, logout,)
 from .forms import UserLoginForm
 
 
+def error_404(request):
+    return redirect('/')
+
+
 def login_view(request):
     print(request.user.is_authenticated)
     next = request.GET.get('next')
